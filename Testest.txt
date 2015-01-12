@@ -1,0 +1,6 @@
+var snd = new Sound("audio\pussies.wav");
+snd.play();
+
+
+
+var snd = new Sound(
