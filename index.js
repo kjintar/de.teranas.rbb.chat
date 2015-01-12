@@ -20,6 +20,7 @@ var user = [{
 // Routing though static middelware
 app.use(express.static(__dirname + '/'));
 app.use(express.static(__dirname + '/smileys'));
+app.use(express.static(__dirname + '/audio'));
 
 // Port used
 var port = 3000;

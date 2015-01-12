@@ -77,7 +77,10 @@
               }
               
            $('#messages').append($('<li>').html(msg)); 
-
+						
+						var snd = new Audio("./audio/pussies.wav");
+						snd.play();
+					
             // check storage functionality
             if(typeof(Storage) !== "undefined") {
                 // overwrite timestamp
