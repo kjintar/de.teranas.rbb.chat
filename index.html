@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html>
 
@@ -17,6 +18,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
+
         // check storage functionality
         if(typeof(Storage) !== "undefined") {
             var date;
@@ -50,16 +52,31 @@
         }
 
         var socket = io();
+        
         $('form').submit(function () {
             socket.emit('username', $('#u').val());
-            socket.emit('chat message', $('#m').val());
-
+            socket.emit('chat message', $('#m').val()); 
+                
             $('#m').val('');
             $('#u').val('');
             return false;
         });
+        
         socket.on('chat message', function (msg) {
-            $('#messages').append($('<li>').text(msg));
+            msg = ($("<div/>").text(msg).html());
+            if (msg.indexOf(":") > -1 && msg.indexOf(";") > -1 ) {            
+                    var reMsg = /(:\w+;)/g;
+                    var reMsg_ng = /(:\w+;)/;
+                    var ma = msg.match(reMsg);
+                    var smiley;
+                    for (var i = 0; i < ma.length; i++) {
+                        ma[i] = ma[i].substr(1, ma[i].length -2);
+                        smiley = "<img class='smiley' src='/smileys/" + ma[i] + ".png' />";
+                        msg = msg.replace(reMsg_ng, smiley);                
+                    };
+              }
+              
+           $('#messages').append($('<li>').html(msg)); 
 
             // check storage functionality
             if(typeof(Storage) !== "undefined") {
@@ -84,14 +101,12 @@
             }
         });
         socket.on('user connected clear', function () {
-            
-            //alert('connection');
             document.getElementById('user').innerHTML = "<h2>Userlist</h2>";
         });
         socket.on('user connected', function (usr) {
             $('#user').append($('<li>').text(usr));
         });
-        
+
     </script>
 </body>
 

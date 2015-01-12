@@ -4,6 +4,9 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var colors = require('colors');
+var fs = require('fs');
+//var smileyFiles = fs.readdirSync("./smileys/");
+//console.log(smileyFiles);
 
 // Prepare global variables
 var msg_old = '';
@@ -37,7 +40,6 @@ var timeWidth = 9;
 var sourceWidth = 18;
 var actionWidth = 14;
 var messageWidth = 50;
-
 // Log head
 console.log(styledLogSeperator(timeWidth) + styledLogSeperator(sourceWidth) + styledLogSeperator(actionWidth) + styledLogSeperator(messageWidth));
 console.log(styledLog('Time', timeWidth) + styledLog('Source', sourceWidth) + styledLog('Action', actionWidth) + styledLog('Message', messageWidth));
