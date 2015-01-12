@@ -61,7 +61,7 @@
         socket.on('chat message', function (msg) {
             $('#messages').append($('<li>').text(msg));
 						
-						var snd = new Sound("audio\pussies.wav");
+						var snd = new Audio("./audio/pussies.wav");
 						snd.play();
 					
             // check storage functionality
