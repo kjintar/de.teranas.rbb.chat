@@ -44,12 +44,19 @@ form button {
     bottom: 50px;
     left: 15%;
 }
+#logo {
+		position: absolute;	
+		background: #242424 url(./img/logo.png);
+		background-size: cover;
+		height:10%;
+		width: 15%;
+}
 #user {
     color: #fff;
     background: #242424;
     position: absolute;
     width: 15%;
-    height: 100%;
+    height: 90%;
     list-style-type: none;
     margin: 0;
     padding: 0;
