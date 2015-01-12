@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Chat</title>
+    <link href='http://fonts.googleapis.com/css?family=Nunito' rel='stylesheet' type='text/css'>
+    <link href='style.css' rel='stylesheet' type='text/css'>
+</head>
+
+<body>
+    <ul id="user"></ul>
+    <ul id="messages"></ul>
+    <form action="">
+        <input id="u" autocomplete="off" placeholder="Rename" /><input id="m" autocomplete="off" placeholder="Enter a Chatmessage" /><button>Send</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+        // check storage functionality
+        if(typeof(Storage) !== "undefined") {
+            var date;
+
+            // check if a timestamp is set
+            if(localStorage.getItem("timestamp") != null) {
+                date = new Date(parseInt(localStorage.getItem("timestamp")));
+                var now = new Date();
+
+                // check if messages available and history is not older than 24 hours
+                if(localStorage.getItem("messages") != "[]" && (now.getTime() - date.getTime()) <= 8640000) {
+                    $("#messages").append($('<li>').text("Nachrichten vom " + date.toLocaleDateString()));
+
+                    // append old messages to chat
+                    var messages = $.parseJSON(localStorage.getItem("messages"));
+
+                    $.each(messages, function(index, value) {
+                        var obj = $('<li>').text(value);
+                        obj.addClass("oldMessage");
+
+                        $("#messages").append(obj);
+                    });
+
+                    $("#messages").append($('<hr>'));
+                }
+            }
+        }
+
+        var socket = io();
+        $('form').submit(function () {
+            socket.emit('username', $('#u').val());
+            socket.emit('chat message', $('#m').val());
+
+            $('#m').val('');
+            $('#u').val('');
+            return false;
+        });
+        socket.on('chat message', function (msg) {
+            $('#messages').append($('<li>').text(msg));
+
+            // check storage functionality
+            if(typeof(Storage) !== "undefined") {
+                // overwrite timestamp
+                var date = new Date();
+                localStorage.setItem("timestamp",date.getTime());
+
+                // get messages, add new message and overwrite it to the storage
+                var messages = $.parseJSON(localStorage.getItem("messages"));
+
+                if(messages.length >= 20) {
+                    messages.shift();
+                }
+
+                messages.push(msg);
+
+                localStorage.setItem("messages", JSON.stringify(messages))
+            }
+        });
+        socket.on('user connected clear', function () {
+            
+            //alert('connection');
+            document.getElementById('user').innerHTML = "<h2>Userlist</h2>";
+        });
+        socket.on('user connected', function (usr) {
+            $('#user').append($('<li>').text(usr));
+        });
+        
+    </script>
+</body>
+
+</html>

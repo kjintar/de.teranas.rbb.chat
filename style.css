@@ -1,0 +1,103 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nunito', sans-serif;
+}
+body,
+html {
+    font: 13px Helvetica, Arial;
+    background-color: #ECECEC;
+}
+form {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+#m {
+    background: #242424;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    width: 70%;
+}
+#u {
+    background: #323232;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    width: 15%;
+}
+form button {
+    box-shadow: #666 0px 0px 1px inset;
+    width: 15%;
+    background: #53983a;
+    border: none;
+    padding: 10px;
+}
+#messages {
+    position: absolute;
+    width: 85%;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    bottom: 50px;
+    left: 15%;
+}
+#user {
+    color: #fff;
+    background: #242424;
+    position: absolute;
+    width: 15%;
+    height: 100%;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    bottom: 0;
+    left: 0px;
+}
+#user li {
+    margin: 2px;
+    margin-left: 10px;
+}
+#user h2 {
+    text-align: center;
+    color: #ccc;
+    background: #121212;
+}
+#messages li {
+    background-color: #fff;
+    box-shadow: #53983a 0px 1px;
+    border-radius: 6px;
+    border-bottom-color: rgb(141, 154, 165);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-style: none;
+    border-bottom-width: 0px;
+    border-left-color: rgb(141, 154, 165);
+    border-left-style: none;
+    border-left-width: 0px;
+    border-right-color: rgb(141, 154, 165);
+    border-right-style: none;
+    border-right-width: 0px;
+    border-top-color: rgb(141, 154, 165);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-top-style: none;
+    border-top-width: 0px;
+    box-shadow: rgba(0, 0, 0, 0.0980392) 0px 1px 0px 0px;
+    color: rgb(81, 88, 74);
+    padding: 5px 20px;
+    margin: 5px 10px 5px 5px;
+}
+
+.oldMessage {
+    opacity: 0.7;
+}
+
+hr {
+    border-color: #ccc;
+    height: 1px;
+    border-width: 0;
+    border-top-width: 1px;
+}
