@@ -75,7 +75,7 @@ io.on('connection', function (socket) {
             found = true;
             username = user[i].username;
 
-            console.log(styledLog('[' + current_hour + ':' + current_min + ']', timeWidth) + styledLog(user[i].ip, sourceWidth) + styledLog('reconnected', actionWidth) + styledLog('SUCCESS', messageWidth));
+            console.log(styledLog('[' + current_hour + ':' + current_min + ']', timeWidth) + styledLog(username, sourceWidth) + styledLog('reconnected', actionWidth) + styledLog('SUCCESS', messageWidth));
         }
     }
 
@@ -104,7 +104,7 @@ io.on('connection', function (socket) {
             // If no dublicate was found set new name
             for (var i = 1; i < user.length; i++) {
                 if (user[i].ip === socket.request.connection.remoteAddress) {
-                    console.log(styledLog('[' + current_hour + ':' + current_min + ']', timeWidth) + styledLog(socket.request.connection.remoteAddress, sourceWidth) + styledLog('renamed', actionWidth) + styledLog('to "' + usrname.substring(0, 18) + '"', messageWidth).green);
+                    console.log(styledLog('[' + current_hour + ':' + current_min + ']', timeWidth) + styledLog(user[i].username, sourceWidth) + styledLog('renamed', actionWidth) + styledLog('to "' + usrname.substring(0, 18) + '"', messageWidth).green);
                     user[i].username = usrname.substring(0, 18);
                 }
             }
@@ -130,17 +130,18 @@ io.on('connection', function (socket) {
             current_min = '0' + current_min;
         }
 
-        // log msg
-        if (msg !== msg_old && msg !== '') {
-            console.log(styledLog('[' + current_hour + ':' + current_min + ']', timeWidth) + styledLog('nulled', sourceWidth) + styledLog('wrote', actionWidth) + styledLog(msg, messageWidth));
-        }
+       
         // get username by IP
         for (var i = 1; i < user.length; i++) {
             if (user[i].ip === socket.request.connection.remoteAddress) {
                 username = user[i].username;
             }
         }
-
+ 				
+				// log msg
+        if (msg !== msg_old && msg !== '') {
+            console.log(styledLog('[' + current_hour + ':' + current_min + ']', timeWidth) + styledLog(username, sourceWidth) + styledLog('wrote', actionWidth) + styledLog(msg, messageWidth));
+        }
         // Spamblock and emptystriper
         if (msg !== msg_old && msg !== '' && msg.substring(0, 1) !== '/') {
             io.emit('chat message', '[' + current_hour + ':' + current_min + '] ' + username + ': ' + msg);
@@ -155,15 +156,7 @@ io.on('connection', function (socket) {
         if (msg === '/spamcount' && msg !== msg_old) {
             io.emit('chat message', 'Server: Recorded ' + spamcounter + ' attempts of spam');
         }
-
-        // Smileys
-        //if (msg.indexOf(":") > -1 && msg.indexOf(";") > -1 ) {
-        //    var re = /.*:\s+(.*)\s+;.*/;
-        /*    var newtext = msg.replace(re, "$1");
-            
-            io.emit('chat message', '['+ current_hour + ':' + current_min + '] ' + username + ': ' + msg + ' ?? ' + newtext);
-        }
-        */
+			
         msg_old = msg;
     });
 });
