@@ -13,12 +13,16 @@
     <ul id="user"></ul>
     <ul id="messages"></ul>
     <form action="">
-        <input id="u" autocomplete="off" placeholder="Rename" /><input id="m" autocomplete="off" placeholder="Enter a Chatmessage" /><button>Send</button>
+        <input id="u" autocomplete="off" placeholder="Rename" /><input id="m" autocomplete="off" placeholder="Enter a Chatmessage" /><div id="smiley"></div><button>Send</button>
     </form>
+    <div style="display: none" id="div_smiley">hier sind smileys</div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
-
+        $('#smiley').on("click", function ()
+            {
+              $("#div_smiley").show()
+        })
         // check storage functionality
         if(typeof(Storage) !== "undefined") {
             var date;
@@ -52,19 +56,19 @@
         }
 
         var socket = io();
-        
+
         $('form').submit(function () {
             socket.emit('username', $('#u').val());
-            socket.emit('chat message', $('#m').val()); 
-                
+            socket.emit('chat message', $('#m').val());
+
             $('#m').val('');
             $('#u').val('');
             return false;
         });
-        
+
         socket.on('chat message', function (msg) {
             msg = ($("<div/>").text(msg).html());
-            if (msg.indexOf(":") > -1 && msg.indexOf(";") > -1 ) {            
+            if (msg.indexOf(":") > -1 && msg.indexOf(";") > -1 ) {
                     var reMsg = /(:\w+;)/g;
                     var reMsg_ng = /(:\w+;)/;
                     var ma = msg.match(reMsg);
@@ -72,11 +76,11 @@
                     for (var i = 0; i < ma.length; i++) {
                         ma[i] = ma[i].substr(1, ma[i].length -2);
                         smiley = "<img class='smiley' src='/smileys/" + ma[i] + ".png' />";
-                        msg = msg.replace(reMsg_ng, smiley);                
+                        msg = msg.replace(reMsg_ng, smiley);
                     };
               }
-            
-				
+
+
 			// WIP //
 			//var snd1 = new Audio("./audio/pussies.wav");
 			//var snd2 = new Audio("./audio/a-team_crazy_fool_x.wav");
@@ -89,12 +93,12 @@
 			  //snd3.play();
 			//}
 			// WIP //
-			
-           $('#messages').append($('<li>').html(msg)); 
-						
+
+           $('#messages').append($('<li>').html(msg));
+
 						var snd = new Audio("./audio/pussies.wav");
 						snd.play();
-					
+
             // check storage functionality
             if(typeof(Storage) !== "undefined") {
                 // overwrite timestamp

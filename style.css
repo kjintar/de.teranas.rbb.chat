@@ -30,10 +30,11 @@ form {
 }
 form button {
     box-shadow: #666 0px 0px 1px inset;
-    width: 15%;
+    width: 11%;
     background: #53983a;
     border: none;
     padding: 10px;
+    cursor: pointer;
 }
 #messages {
     position: absolute;
@@ -45,7 +46,7 @@ form button {
     left: 15%;
 }
 #logo {
-		position: absolute;	
+		position: absolute;
 		background: #242424 url(./img/logo.png);
 		background-size: cover;
 		height:10%;
@@ -107,4 +108,28 @@ hr {
     height: 1px;
     border-width: 0;
     border-top-width: 1px;
+}
+
+#smiley {
+    box-shadow: 0px 0px 1px #666 inset;
+    background: none repeat scroll 0% 0% #53983A;
+    border: medium none;
+    display: inline;
+    padding: 12px 2%;
+    background-image: url("div_smiley2.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    cursor: pointer;
+}
+
+#div_smiley{
+    position:absolute;
+    padding:5px;
+    top:50%;
+    left:49%;
+    width:50%;
+    height:43%;
+    background-color: #323232;
+    color:#a9a9a9;
+    box-shadow:#000 0 0 5px;
 }
