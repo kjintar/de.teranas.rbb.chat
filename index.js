@@ -4,6 +4,9 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var colors = require('colors');
+var userManagement = require('./usermanagement');
+
+userManagement.setUp();
 
 // Prepare global variables
 var msg_old = '';
