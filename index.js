@@ -132,7 +132,7 @@ io.on('connection', function (socket) {
 
         // log msg
         if (msg !== msg_old && msg !== '') {
-            console.log(styledLog('[' + current_hour + ':' + current_min + ']', timeWidth) + styledLog(socket.request.connection.remoteAddress, sourceWidth) + styledLog('wrote', actionWidth) + styledLog(msg, messageWidth));
+            console.log(styledLog('[' + current_hour + ':' + current_min + ']', timeWidth) + styledLog('nulled', sourceWidth) + styledLog('wrote', actionWidth) + styledLog(msg, messageWidth));
         }
         // get username by IP
         for (var i = 1; i < user.length; i++) {
@@ -155,7 +155,6 @@ io.on('connection', function (socket) {
         if (msg === '/spamcount' && msg !== msg_old) {
             io.emit('chat message', 'Server: Recorded ' + spamcounter + ' attempts of spam');
         }
-
 
         // Smileys
         //if (msg.indexOf(":") > -1 && msg.indexOf(";") > -1 ) {
