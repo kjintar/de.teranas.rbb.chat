@@ -32,14 +32,18 @@
                     // append old messages to chat
                     var messages = $.parseJSON(localStorage.getItem("messages"));
 
-                    $.each(messages, function(index, value) {
-                        var obj = $('<li>').text(value);
-                        obj.addClass("oldMessage");
+                    if(messages.length > 0) {
+                        $.each(messages, function(index, value) {
+                            var obj = $('<li>').text(value);
+                            obj.addClass("oldMessage");
 
-                        $("#messages").append(obj);
-                    });
+                            $("#messages").append(obj);
+                        });
 
-                    $("#messages").append($('<hr>'));
+                        $("#messages").append($('<hr>'));
+                    }
+                } else {
+                    localStorage.setItem("messages", JSON.stringify([]));
                 }
             }
         }
@@ -64,6 +68,10 @@
 
                 // get messages, add new message and overwrite it to the storage
                 var messages = $.parseJSON(localStorage.getItem("messages"));
+
+                if(messages == null) {
+                    messages = [];
+                }
 
                 if(messages.length >= 20) {
                     messages.shift();
