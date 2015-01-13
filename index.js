@@ -153,8 +153,6 @@ userManagement.initialize(function() {
                 // TODO: Setzen neue Werte in Datenbank
                 user[user_id].old_msg = msg;
                 user[user_id].time_old = time_msg;
-                });
-            });
             });
         });
 
