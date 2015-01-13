@@ -13,9 +13,11 @@ var userManagement = require('./usermanagement');
 var msg_old = '';
 var spamcounter = 0;
 var user = [{
-    'ip': '127.0.0.1',
-    'username': 'Server',
-    'status': '0'
+'ip': '127.0.0.1',
+'username': 'Server',
+'status': 0,
+'old_msg': '',
+'time_old': ''
 }];
 
 // Routing though static middelware
@@ -29,12 +31,12 @@ var port = 3000;
 
 //Style Console Log
 function styledLog(logmsg, maxlenght) {
-    return (new Array(maxlenght - String(logmsg.substring(0, maxlenght)).length + 1)).join(" ").concat(logmsg.substring(0, maxlenght)) + ' | ';
+return (new Array(maxlenght - String(logmsg.substring(0, maxlenght)).length + 1)).join(" ").concat(logmsg.substring(0, maxlenght)) + ' | ';
 }
 
 //Style Console Log seperator
 function styledLogSeperator(maxlenght) {
-    return (new Array(maxlenght - String('-').length + 1)).join('-').concat('-') + '-| ';
+return (new Array(maxlenght - String('-').length + 1)).join('-').concat('-') + '-| ';
 }
 
 //padwidths
@@ -123,17 +125,23 @@ userManagement.initialize(function() {
                 current_min = '0' + current_min;
             }
             userManagement.getUserByIP(socket.request.connection.remoteAddress, function(err, user) {
-                // log msg
+                // get username by IP
+                username = user.username;
+                msg_old = user.old_msg;
+                time_old = user.time_old;
+                
+                 // log msg
                 if (msg !== msg_old && msg !== '') {
-                    console.log(styledLog('[' + current_hour + ':' + current_min + ']', timeWidth) + styledLog(user.username, sourceWidth) + styledLog('wrote', actionWidth) + styledLog(msg, messageWidth));
+                    console.log(styledLog('[' + current_hour + ':' + current_min + ']', timeWidth) + styledLog(username, sourceWidth) + styledLog('wrote', actionWidth) + styledLog(msg, messageWidth));
                 }
+                
                 // Spamblock and emptystriper
-                if (msg !== msg_old && msg !== '' && msg.substring(0, 1) !== '/') {
-                    io.emit('chat message', '[' + current_hour + ':' + current_min + '] ' + user.username + ': ' + msg);
+                if ((msg !== msg_old) && msg !== '' && msg.substring(0, 1) !== '/' && time_old !== time_msg) {
+                    io.emit('chat message', '[' + current_hour + ':' + current_min + '] ' + username + ': ' + msg);
                 } else if (msg !== '') {
                     spamcounter++;
                 }
-
+                
                 // Commands
                 if (msg === '/time' && msg !== msg_old) {
                     io.emit('chat message', 'Server: ' + current_hour + ':' + current_min);
@@ -141,8 +149,12 @@ userManagement.initialize(function() {
                 if (msg === '/spamcount' && msg !== msg_old) {
                     io.emit('chat message', 'Server: Recorded ' + spamcounter + ' attempts of spam');
                 }
-
-                msg_old = msg;
+                
+                // TODO: Setzen neue Werte in Datenbank
+                user[user_id].old_msg = msg;
+                user[user_id].time_old = time_msg;
+                });
+            });
             });
         });
 

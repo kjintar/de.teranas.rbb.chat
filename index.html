@@ -1,134 +1,116 @@
 
 <!doctype html>
 <html>
-
 <head>
-    <title>Chat</title>
-    <link href='http://fonts.googleapis.com/css?family=Nunito' rel='stylesheet' type='text/css'>
-    <link href='style.css' rel='stylesheet' type='text/css'>
+<title>Chat</title>
+<link href='http://fonts.googleapis.com/css?family=Nunito' rel='stylesheet' type='text/css'>
+<link href='style.css' rel='stylesheet' type='text/css'>
 </head>
-
 <body>
-		<ul id="logo"></ul>
-    <ul id="user"></ul>
-    <ul id="messages"></ul>
-    <form action="">
-        <input id="u" autocomplete="off" placeholder="Rename" /><input id="m" autocomplete="off" placeholder="Enter a Chatmessage" /><div id="smiley"></div><button>Send</button>
-    </form>
-    <div style="display: none" id="div_smiley">hier sind smileys</div>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
-    <script>
-        $('#smiley').on("click", function ()
-            {
-              $("#div_smiley").show()
-        })
-        // check storage functionality
-        if(typeof(Storage) !== "undefined") {
-            var date;
-
-            // check if a timestamp is set
-            if(localStorage.getItem("timestamp") != null) {
-                date = new Date(parseInt(localStorage.getItem("timestamp")));
-                var now = new Date();
-
-                // check if messages available and history is not older than 24 hours
-                if(localStorage.getItem("messages") != null && localStorage.getItem("messages") != "[]" && (now.getTime() - date.getTime()) <= 8640000) {
-                    $("#messages").append($('<li>').text("Nachrichten vom " + date.toLocaleDateString()));
-
-                    // append old messages to chat
-                    var messages = $.parseJSON(localStorage.getItem("messages"));
-
-                    if(messages.length > 0) {
-                        $.each(messages, function(index, value) {
-                            var obj = $('<li>').text(value);
-                            obj.addClass("oldMessage");
-
-                            $("#messages").append(obj);
-                        });
-
-                        $("#messages").append($('<hr>'));
-                    }
-                } else {
-                    localStorage.setItem("messages", JSON.stringify([]));
-                }
-            }
-        }
-
-        var socket = io();
-
-        $('form').submit(function () {
-            socket.emit('username', $('#u').val());
-            socket.emit('chat message', $('#m').val());
-
-            $('#m').val('');
-            $('#u').val('');
-            return false;
-        });
-
-        socket.on('chat message', function (msg) {
-            msg = ($("<div/>").text(msg).html());
-            if (msg.indexOf(":") > -1 && msg.indexOf(";") > -1 ) {
-                    var reMsg = /(:\w+;)/g;
-                    var reMsg_ng = /(:\w+;)/;
-                    var ma = msg.match(reMsg);
-                    var smiley;
-                    for (var i = 0; i < ma.length; i++) {
-                        ma[i] = ma[i].substr(1, ma[i].length -2);
-                        smiley = "<img class='smiley' src='/smileys/" + ma[i] + ".png' />";
-                        msg = msg.replace(reMsg_ng, smiley);
-                    };
-              }
+<ul id="logo"></ul>
+<ul id="user"></ul>
+<ul id="messages"></ul>
+<form action="">
+<input id="u" autocomplete="off" placeholder="Rename" /><input id="m" autocomplete="off" placeholder="Enter a Chatmessage" /><div id="smiley"></div><button>Send</button>
+</form>
+<div style="display: none" id="div_smiley">hier sind smileys</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+$('#smiley').on("click", function ()
+{
+$("#div_smiley").show()
+})
+// check storage functionality
+if(typeof(Storage) !== "undefined") {
+var date;
+// check if a timestamp is set
+if(localStorage.getItem("timestamp") != null) {
+date = new Date(parseInt(localStorage.getItem("timestamp")));
+var now = new Date();
+// check if messages available and history is not older than 24 hours
+if(localStorage.getItem("messages") != null && localStorage.getItem("messages") != "[]" && (now.getTime() - date.getTime()) <= 8640000) {
+$("#messages").append($('<li>').text("Nachrichten vom " + date.toLocaleDateString()));
+// append old messages to chat
+var messages = $.parseJSON(localStorage.getItem("messages"));
+if(messages.length > 0) {
+$.each(messages, function(index, value) {
+var obj = $('<li>').text(value);
+obj.addClass("oldMessage");
+$("#messages").append(obj);
+});
+$("#messages").append($('<hr>'));
+}
+} else {
+localStorage.setItem("messages", JSON.stringify([]));
+}
+}
+}
+var socket = io();
+$('form').submit(function () {
+socket.emit('username', $('#u').val());
+socket.emit('chat message', $('#m').val());
+$('#m').val('');
+$('#u').val('');
+return false;
+});
+socket.on('chat message', function (msg) {
+msg = ($("<div/>").text(msg).html());
+if (msg.indexOf(":") > -1 && msg.indexOf(";") > -1 ) {
+var reMsg = /(:\w+;)/g;
+var reMsg_ng = /(:\w+;)/;
+var ma = msg.match(reMsg);
+var smiley;
+for (var i = 0; i < ma.length; i++) {
+ma[i] = ma[i].substr(1, ma[i].length -2);
+smiley = "<img class='smiley' src='/smileys/" + ma[i] + ".png' />";
+msg = msg.replace(reMsg_ng, smiley);
+};
+}
 
 
-			// WIP //
-			//var snd1 = new Audio("./audio/pussies.wav");
-			//var snd2 = new Audio("./audio/a-team_crazy_fool_x.wav");
-			//var snd3 = new Audio("./audio/whats_your_name.wav");
-            //if(messages == '%pussy%') {
-			  //snd1.play();
-            //} else if (messages == '%crazy fool%'){
-			  //snd2.play();
-			//} else if (messages == '%your name%'){
-			  //snd3.play();
-			//}
-			// WIP //
+// Audio
+if (msg.indexOf("#") > -1 && msg.indexOf(";") > -1 ) {	
+		var audioMsg = /(#\w+;)/;
+		var audio = msg.match(audioMsg);
+		if(audio == 'pussy'){
+			var snd = new Audio('./audio/'+audio+'.wav');
+			snd.play();
+		}
+	} else {
+			var snd = new Audio('./audio/sonar2.wav');
+			snd.play();		
+	}
+// Audio
 
-           $('#messages').append($('<li>').html(msg));
 
-						var snd = new Audio("./audio/pussies.wav");
-						snd.play();
 
-            // check storage functionality
-            if(typeof(Storage) !== "undefined") {
-                // overwrite timestamp
-                var date = new Date();
-                localStorage.setItem("timestamp",date.getTime());
-
-                // get messages, add new message and overwrite it to the storage
-                var messages = $.parseJSON(localStorage.getItem("messages"));
-
-                if(messages == null) {
-                    messages = [];
-                }
-
-                if(messages.length >= 20) {
-                    messages.shift();
-                }
-
-                messages.push(msg);
-
-                localStorage.setItem("messages", JSON.stringify(messages))
-            }
-        });
-        socket.on('user connected clear', function () {
-            document.getElementById('user').innerHTML = "<h2>Userlist</h2>";
-        });
-        socket.on('user connected', function (usr) {
-            $('#user').append($('<li>').text(usr));
-        });
-
-    </script>
+$('#messages').append($('<li>').html(msg));
+var snd = new Audio("./audio/pussies.wav");
+snd.play();
+// check storage functionality
+if(typeof(Storage) !== "undefined") {
+// overwrite timestamp
+var date = new Date();
+localStorage.setItem("timestamp",date.getTime());
+// get messages, add new message and overwrite it to the storage
+var messages = $.parseJSON(localStorage.getItem("messages"));
+if(messages == null) {
+messages = [];
+}
+if(messages.length >= 20) {
+messages.shift();
+}
+messages.push(msg);
+localStorage.setItem("messages", JSON.stringify(messages))
+}
+});
+socket.on('user connected clear', function () {
+document.getElementById('user').innerHTML = "<h2>Userlist</h2>";
+});
+socket.on('user connected', function (usr) {
+$('#user').append($('<li>').text(usr));
+});
+</script>
 </body>
-
 </html>
