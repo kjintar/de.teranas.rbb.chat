@@ -13,13 +13,13 @@ This is an Node.js chat called "ChatThat!" made for ours school project week.
 
 ## Contributors
 
-Hans Koch (Hammster) 
-Niklas Siepmann (Teranas)
-Christian Glass (Kasperx)
-Benjamin Altemeyer (Bensai)
-Linus Kintscher (Quad2Core)
-Felix Falkenhain
-Sven Lindenau
+- Hans Koch (Hammster) 
+- Niklas Siepmann (Teranas)
+- Christian Glass (Kasperx)
+- Benjamin Altemeyer (Bensai)
+- Linus Kintscher (Quad2Core)
+- Felix Falkenhain
+- Sven Lindenau
 
 ## License
 
