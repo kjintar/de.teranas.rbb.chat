@@ -7,7 +7,7 @@ var colors = require('colors');
 var fs = require('fs');
 var utility = require('./utilitys.js');
 var log = require('./log.js');
-//var userManagement = require('./usermanagement');
+var userManagement = require('./usermanagement');
 
 // Port used
 var port = 3000;
@@ -24,128 +24,143 @@ for (var i = smileyLength - 1; i >= 0; i--) {
   if (!smileyFiles[i].match(/[.](jpg|png|bmp|gif|jpeg)/)) {
     smileyFiles.splice(i, 1);
   }
-};
+}
 
 // userManagement.setUp();
 
 // Prepare global variables
 var msg_old = '';
 var spamcounter = 0;
-var user = [{
-  'ip': '127.0.0.1',
-  'username': 'Server',
-  'status': '1'
-}];
 
 log.styledLogHead();
 
-// Connection eventhandler
-io.on('connection', function(socket) {
+userManagement.setUp(function() {
+    // Connection eventhandler
+    io.on('connection', function(socket) {
+        var broadcastUsers = function() {
+            io.emit('user connected clear');
 
-  io.emit('user connected clear');
+            userManagement.getUsers(function(err, rows) {
+                if(typeof rows !== "undefined") {
+                    for(var i = 0; i < rows.length; i++) {
+                        io.emit('user connected', rows[i]['username'], smileyFiles);
+                    }
+                }
+            });
+        };
 
-  for (var i = 1; i < user.length; i++) {
-    io.emit('user connected', user[i].username, smileyFiles);
-  }
+        broadcastUsers();
 
-  var found = false;
-  var username = 'unbekannt';
+        var found = false;
+        var username = 'unbekannt';
 
-  // Check if IP is associated to a username and log it when something is found
-  for (var i = 1; i < user.length; i++) {
-    if (user[i].ip === socket.request.connection.remoteAddress) {
-      found = true;
-      username = user[i].username;
-			log.styledLogFormated(username,'Reconnected','SUCCESS');
-    }
-  }
+        userManagement.getUserByIP(socket.request.connection.remoteAddress, function(err, result) {
+            if(typeof result !== "undefined") {
+                found = true;
+                username = result['username'];
+                log.styledLogFormated(result['username'],'Reconnected','SUCCESS');
+            } else {
+                userManagement.getHighestID(function(err, row) {
+                    var newID = 1;
 
-  // If no user was found, create one and log it
-  if (found === false) {
-    user.push({
-      'ip': socket.request.connection.remoteAddress,
-      'username': 'User ' + user.length,
-      'status': '1'
+                    if(typeof row !== "undefined") newID = row['maxID'] + 1;
+
+                    userManagement.addUser({
+                        'ip': socket.request.connection.remoteAddress,
+                        'status': 1,
+                        'username': "User" + newID
+                    }, function() {
+                        log.styledLogFormated(socket.request.connection.remoteAddress,'Connected','SUCCESS');
+                        broadcastUsers();
+                    });
+                });
+
+            }
+        });
+
+        // If usrname input isset check and, set or deny
+        socket.on('username', function(usrname) {
+            if (usrname !== '') {
+                // Prüfe ob Name vergeben
+                userManagement.getUserByName(usrname, function(err, row) {
+                    if(typeof row !== "undefined") {
+                        io.emit('chat message', 'Server: Name vergeben');
+                        log.styledLogFormated(socket.request.connection.remoteAddress,'Renamed','FAIL');
+                    } else {
+
+                        // Hole Benutzerdaten aus Datenbank
+                        userManagement.getUserByIP(socket.request.connection.remoteAddress, function(err, user) {
+                            if(typeof user !== "undefined") {
+
+                                // Schreibe Benutzernamen
+                                userManagement.setUsername(user['userID'], usrname.substring(0, 18), function(err, row) {
+                                    if(err == null) {
+                                        log.styledLogFormated(username,'Renamed','to "' + usrname.substring(0, 18) + '"');
+
+                                        broadcastUsers();
+                                    } else {
+                                        io.emit('chat message', 'Server: Namensänderung fehlgeschlagen');
+                                        log.styledLogFormated(socket.request.connection.remoteAddress,'Renamed','FAIL');
+                                    }
+                                })
+                            } else {
+                                io.emit('chat message', 'Server: Benutzer nicht gefunden');
+                                log.styledLogFormated(socket.request.connection.remoteAddress,'Renamed','FAIL');
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        // Handel user msg
+        socket.on('chat message', function(msg) {
+            userManagement.getUserByIP(socket.request.connection.remoteAddress, function(err, user) {
+                if(typeof user !== "undefined") {
+                    username = user['username'];
+
+                    // log msg
+                    if (msg !== msg_old && msg !== '') {
+                        log.styledLogFormated(username,'Wrote',msg);
+                    }
+
+                    msg = utility.safeTagsReplace(msg);
+
+                    var reMsg = /(:\w+;)/g;
+                    var ma = msg.match(reMsg);
+
+                    if (typeof ma !== 'undefined' && ma !== null) {
+                        var reMsg_ng = /(:\w+;)/;
+                        var smiley;
+                        for (var i = 0; i < ma.length; i++) {
+                            ma[i] = ma[i].substr(1, ma[i].length - 2);
+                            if (smileyFiles.indexOf(ma[i] + '.png') > -1) {
+                                smiley = "<img class='smiley' src='/smileys/" + ma[i] + ".png' />";
+                                msg = msg.replace(reMsg_ng, smiley);
+                            }
+                        }
+                    }
+
+                    // Spamblock and emptystriper
+                    if (msg !== msg_old && msg !== '' && msg.substring(0, 1) !== '/') {
+                        io.emit('chat message', utility.currentTime() + username + ': ' + msg);
+                    } else if (msg !== '') {
+                        spamcounter++;
+                    }
+
+                    // Commands
+                    if (msg === '/time' && msg !== msg_old) {
+                        io.emit('chat message', 'Server: ' + utility.currentTime());
+                    }
+                    if (msg === '/spamcount' && msg !== msg_old) {
+                        io.emit('chat message', 'Server: Recorded ' + spamcounter + ' attempts of spam');
+                    }
+
+                    msg_old = msg;
+                }
+            });
+        });
     });
-		log.styledLogFormated(socket.request.connection.remoteAddress,'Connected','SUCCESS');
-  }
-
-  // If usrname input isset check and, set or deny
-  socket.on('username', function(usrname) {
-
-    if (usrname !== '') {
-      // Check each username and look for dublicate and deny if there is one
-      for (var i = 1; i < user.length; i++) {
-        if (user[i].username === usrname) {
-          io.emit('chat message', 'Server: Name vergeben');
-          log.styledLogFormated(socket.request.connection.remoteAddress,'Renamed','FAIL');
-          return;
-        }
-      }
-      // If no dublicate was found set new name
-      for (var i = 1; i < user.length; i++) {
-        if (user[i].ip === socket.request.connection.remoteAddress) {
-          log.styledLogFormated(username,'Renamed','to "' + usrname.substring(0, 18) + '"');
-          user[i].username = usrname.substring(0, 18);
-        }
-      }
-
-      io.emit('user connected clear');
-      for (var i = 1; i < user.length; i++) {
-        io.emit('user connected', user[i].username);
-      }
-    }
-  });
-
-  // Handel user msg
-  socket.on('chat message', function(msg) {
-
-    // get username by IP
-    for (var i = 1; i < user.length; i++) {
-      if (user[i].ip === socket.request.connection.remoteAddress) {
-        username = user[i].username;
-      }
-    }
-
-    // log msg
-    if (msg !== msg_old && msg !== '') {
-      log.styledLogFormated(username,'Wrote',msg);
-    }
-		
-    msg = utility.safeTagsReplace(msg);
-
-    var reMsg = /(:\w+;)/g;
-    var ma = msg.match(reMsg);
-
-    if (typeof ma !== 'undefined' && ma !== null) {
-      var reMsg_ng = /(:\w+;)/;
-      var smiley;
-      for (var i = 0; i < ma.length; i++) {
-        ma[i] = ma[i].substr(1, ma[i].length - 2);
-        if (smileyFiles.indexOf(ma[i] + '.png') > -1) {
-          smiley = "<img class='smiley' src='/smileys/" + ma[i] + ".png' />";
-          msg = msg.replace(reMsg_ng, smiley);
-        }
-      };
-    }
-
-    // Spamblock and emptystriper
-    if (msg !== msg_old && msg !== '' && msg.substring(0, 1) !== '/') {
-      io.emit('chat message', utility.currentTime() + username + ': ' + msg);
-    } else if (msg !== '') {
-      spamcounter++;
-    }
-
-    // Commands
-    if (msg === '/time' && msg !== msg_old) {
-      io.emit('chat message', 'Server: ' + utility.currentTime());
-    }
-    if (msg === '/spamcount' && msg !== msg_old) {
-      io.emit('chat message', 'Server: Recorded ' + spamcounter + ' attempts of spam');
-    }
-
-    msg_old = msg;
-  });
 });
 
 http.listen(port, function() {
