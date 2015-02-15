@@ -142,12 +142,10 @@ userManagement.setUp(function() {
                         }
                     }
 
-                    // Spamblock and emptystriper
-                    if (msg !== msg_old && msg !== '' && msg.substring(0, 1) !== '/') {
-                        io.emit('chat message', utility.currentTime() + username + ': ' + msg);
-                    } else if (msg !== '') {
-                        spamcounter++;
-                    }
+                  // Spamblock and emptystriper
+                     if (spamFilter.blockRepeated(msg, username) == false) {
+                       io.emit('chat message', utility.currentTime() + username + ': ' + msg);
+                   	  }
 
                     // Commands
                     if (msg === '/time' && msg !== msg_old) {
