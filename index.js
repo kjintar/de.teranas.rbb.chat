@@ -8,6 +8,7 @@ var fs = require('fs');
 var utility = require('./utilitys.js');
 var log = require('./log.js');
 var userManagement = require('./usermanagement');
+var spamFilter = require('./spamfilter.js');
 
 // Port used
 var port = 3000;
