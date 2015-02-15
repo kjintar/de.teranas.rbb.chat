@@ -92,8 +92,6 @@ exports.addUser = function(userdata, callback) {
         data['$status'] = userdata['status'];
     }
 
-    console.log(userdata);
-
     db.run("INSERT INTO USERS (ip, username, password, lastMessage, status) VALUES ($ip, $username, $password, $lastMessage, $status)", data, function(err, result) {
         if(err != null) {
             var e = new Error();

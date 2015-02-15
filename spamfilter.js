@@ -1,16 +1,27 @@
-var exports = module.exports = {}; 
-export.msg_old = "";
-export.spamcounter = 0;
+var exports = module.exports = {};
+var index = require('./index');
+
+exports.spamcounter = 0;
  
  // Spamblock and emptystriper
- export.blockRepeated = function (msg, username) {
-                     var spam = true;
-                    if (msg !== this.msg_old && msg !== '' && msg.substring(0, 1) !== '/') {
-                       /*  */
-                        spam = false;
-                    } else if (msg !== '') {
-                        spam = true;                    	
-                        this.spamcounter++;
-   }
-   return spam;
-}
+exports.blockRepeated = function (msg, username, callback) {
+  var spam = true;
+  var lastMessage = "";
+
+  index.userManagement.getUserByName(username, function(err, user) {
+    if(typeof user !== "undefined")
+    {
+      lastMessage = user['lastMessage'];
+    }
+
+    if (msg !== lastMessage && msg !== '') {
+      spam = false;
+    } else if (msg !== '') {
+      spam = true;
+
+      module.exports.spamcounter++;
+    }
+
+    callback(spam);
+  });
+};

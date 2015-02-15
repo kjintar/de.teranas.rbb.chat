@@ -27,15 +27,11 @@ for (var i = smileyLength - 1; i >= 0; i--) {
   }
 }
 
-// userManagement.setUp();
-
-// Prepare global variables
-var msg_old = '';
-var spamcounter = 0;
-
 log.styledLogHead();
 
 userManagement.setUp(function() {
+    module.exports.userManagement = userManagement;
+
     // Connection eventhandler
     io.on('connection', function(socket) {
         var broadcastUsers = function() {
@@ -121,7 +117,7 @@ userManagement.setUp(function() {
                     username = user['username'];
 
                     // log msg
-                    if (msg !== msg_old && msg !== '') {
+                    if (msg !== '') {
                         log.styledLogFormated(username,'Wrote',msg);
                     }
 
@@ -142,20 +138,30 @@ userManagement.setUp(function() {
                         }
                     }
 
-                  // Spamblock and emptystriper
-                     if (spamFilter.blockRepeated(msg, username) == false) {
-                       io.emit('chat message', utility.currentTime() + username + ': ' + msg);
-                   	  }
+                      // Spamblock and emptystriper
+                    spamFilter.blockRepeated(msg, username, function(spam)
+                    {
+                      if(!spam)
+                      {
+                        io.emit('chat message', utility.currentTime() + username + ': ' + msg);
 
-                    // Commands
-                    if (msg === '/time' && msg !== msg_old) {
-                        io.emit('chat message', 'Server: ' + utility.currentTime());
-                    }
-                    if (msg === '/spamcount' && msg !== msg_old) {
-                        io.emit('chat message', 'Server: Recorded ' + spamcounter + ' attempts of spam');
-                    }
+                        userManagement.getUserByName(username, function(err, user)
+                        {
+                          if(typeof user !== "undefined")
+                          {
+                            userManagement.setLastMessage(user['userID'], msg, function(){});
+                          }
+                        });
 
-                    msg_old = msg;
+                        // Commands
+                        if (msg === '/time') {
+                          io.emit('chat message', 'Server: ' + utility.currentTime());
+                        }
+                        if (msg === '/spamcount') {
+                          io.emit('chat message', 'Server: Recorded ' + spamFilter.spamcounter + ' attempts of spam');
+                        }
+                      }
+                    });
                 }
             });
         });
