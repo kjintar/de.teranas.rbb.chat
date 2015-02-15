@@ -9,6 +9,7 @@ var utility = require('./utilitys.js');
 var log = require('./log.js');
 var userManagement = require('./usermanagement');
 var sound = require('./sound.js');
+var spamFilter = require('./spamfilter.js');
 
 // Port used
 var port = 3000;
@@ -142,12 +143,10 @@ userManagement.setUp(function() {
                         }
                     }
 
-                    // Spamblock and emptystriper
-                    if (msg !== msg_old && msg !== '' && msg.substring(0, 1) !== '/') {
-                        io.emit('chat message', utility.currentTime() + username + ': ' + msg);
-                    } else if (msg !== '') {
-                        spamcounter++;
-                    }
+                 // Spamblock and emptystriper
+                     if (spamFilter.blockRepeated(msg, username) == false) {
+                       io.emit('chat message', utility.currentTime() + username + ': ' + msg);
+                   	  }
 
                     // Commands
                     if (msg === '/time' && msg !== msg_old) {
