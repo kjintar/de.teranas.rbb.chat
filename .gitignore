@@ -64,3 +64,6 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 img/Thumbs.db
+
+# Node Modules
+node_modules/*
