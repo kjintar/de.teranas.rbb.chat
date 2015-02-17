@@ -71,24 +71,25 @@
 		});
 
 		socket.on('chat message', function (msg) {
-			/*
+			
         	msg = ($("<div/>").text(msg).html());
         	
+        	/**
         	var reMsg = /(:\w+;)/g;
         	var ma = msg.match(reMsg);		
-            
-            //msg.indexOf(":") > -1 && msg.indexOf(";") > -1 
 
             if (typeof ma !== 'undefined' && ma !== null) {
-                    var reMsg_ng = /(:\w+;)/;
-                    var smiley;
-                    for (var i = 0; i < ma.length; i++) {
-                        ma[i] = ma[i].substr(1, ma[i].length -2);
-                        smiley = "<img class='smiley' src='/smileys/" + ma[i] + ".png' />";
-                        msg = msg.replace(reMsg_ng, smiley);
-                    };
-              }
-*/
+                var reMsg_ng = /(:\w+;)/;
+                var smiley;
+                
+                for (var i = 0; i < ma.length; i++) {
+                    ma[i] = ma[i].substr(1, ma[i].length -2);
+                    smiley = "<img class='smiley' src='/smileys/" + ma[i] + ".png' />";
+                    msg = msg.replace(reMsg_ng, smiley);
+                };
+            }
+            **/
+
 
 			var snd1 = new Audio("./audio/pussies.wav");
 			var snd2 = new Audio("./audio/a-team_crazy_fool_x.wav");
@@ -100,7 +101,6 @@
 			} else if (messages == '%your name%'){
 			  snd3.play();
 			}
-		
 
 			$('#messages').append($('<li>').html(msg));
 
@@ -133,18 +133,15 @@
 			document.getElementById('user').innerHTML = "<h2>Userlist</h2>";
 		});
 		socket.on('user connected', function (usr, smileys) {
-			console.log(smileys);
+			$("#div_smiley").empty();
 
 			$.each(smileys, function (index, value) {
-				console.log(value);
-
 				DataValue = value.substr(0, value.length - 4);
-				$("#div_smiley").empty();
 				$("#div_smiley").append($('<img>').attr("src", "smileys/" + value).addClass("smiley_function").attr("data-name", DataValue));
 			}); //end each()
 
 			$('.smiley_function').on("click", function () {
-				$("#m").val($("#m").val() + ":" + $(this).data("name") + ";");
+				$("#m").val($("#m").val() + ":	 + $(this).data("name") + ";");
 				$("#div_smiley").hide();
 				$("#m").focus();
 			});
