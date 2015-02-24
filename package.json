@@ -1,10 +1,14 @@
 {
   "name": "chat-that",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Node - Socket.io based Chat suited for the local network",
+  "repository": {
+  "type": "git",
+  "url": "git://github.com/Teranas/de.teranas.rbb.chat.git"
+  },
   "dependencies": {
-    "express": "^4.9.8",
-    "socket.io": "1.0.2",
+    "express": "4.12.0",
+    "socket.io": "1.3.4",
     "colors": "1.0.3",
 		"sqlite3": "3.0.4"
   }
