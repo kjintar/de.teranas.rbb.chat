@@ -1,5 +1,5 @@
 var exports = module.exports = {};
-var index = require('./index');
+var userManagement = require('./usermanagement');
 
 exports.spamcounter = 0;
  
@@ -8,7 +8,7 @@ exports.blockRepeated = function (msg, username, callback) {
   var spam = true;
   var lastMessage = "";
 
-  index.userManagement.getUserByName(username, function(err, user) {
+  userManagement.getUserByName(username, function(err, user) {
     if(typeof user !== "undefined")
     {
       lastMessage = user['lastMessage'];
