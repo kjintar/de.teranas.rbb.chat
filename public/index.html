@@ -2,153 +2,27 @@
 <html>
 
 <head>
-	<title>Chat</title>
-	<link href='http://fonts.googleapis.com/css?family=Nunito' rel='stylesheet' type='text/css'>
-	<link href='style.css' rel='stylesheet' type='text/css'>
-	<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+  <title>Chat</title>
+  <link href='http://fonts.googleapis.com/css?family=Nunito' rel='stylesheet' type='text/css'>
+  <link href='style.css' rel='stylesheet' type='text/css'>
+  <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
 </head>
 
 <body>
-	<ul id="logo"></ul>
-	<ul id="user"></ul>
-	<ul id="messages"></ul>
-	<form action="">
-		<input id="u" autocomplete="off" placeholder="Rename" />
-		<input id="m" autocomplete="off" placeholder="Enter a Chatmessage" />
-		<div id="smiley"></div>
-		<button>Send</button>
-	</form>
-	<div id="div_smiley">
+  <ul id="logo"></ul>
+  <ul id="user"></ul>
+  <ul id="messages"></ul>
+  <form action="">
+    <input id="u" autocomplete="off" placeholder="Rename" />
+    <input id="m" autocomplete="off" placeholder="Enter a Chatmessage" />
+    <div id="smiley"></div>
+    <button>Send</button>
+  </form>
+  <div id="div_smiley">
 
-	</div>
-	<script src="/socket.io/socket.io.js"></script>
-	<!--<script src="http://code.jquery.com/jquery-1.11.1.js"></script> -->
-	<script>
-		$('#smiley').on("click", function () {
-			$("#div_smiley").toggle()
-		});
-		 // check storage functionality
-		if (typeof (Storage) !== "undefined") {
-			var date;
-
-			// check if a timestamp is set
-			if (localStorage.getItem("timestamp") != null) {
-				date = new Date(parseInt(localStorage.getItem("timestamp")));
-				var now = new Date();
-
-				// check if messages available and history is not older than 24 hours
-				if (localStorage.getItem("messages") != null && localStorage.getItem("messages") != "[]" && (now.getTime() - date.getTime()) <= 8640000) {
-					$("#messages").append($('<li>').html("Nachrichten vom " + date.toLocaleDateString()));
-
-					// append old messages to chat
-					var messages = $.parseJSON(localStorage.getItem("messages"));
-
-					if (messages.length > 0) {
-						$.each(messages, function (index, value) {
-							var obj = $('<li>').html(value);
-							obj.addClass("oldMessage");
-
-							$("#messages").append(obj);
-						});
-
-						$("#messages").append($('<hr>'));
-					}
-				} else {
-					localStorage.setItem("messages", JSON.stringify([]));
-				}
-			}
-		}
-
-		var socket = io();
-
-		$('form').submit(function () {
-			socket.emit('username', $('#u').val());
-			socket.emit('chat message', $('#m').val());
-
-			$('#m').val('');
-			$('#u').val('');
-			return false;
-		});
-
-		socket.on('chat message', function (msg) {
-			
-        	msg = ($("<div/>").text(msg).html());
-        	
-        	/**
-        	var reMsg = /(:\w+;)/g;
-        	var ma = msg.match(reMsg);		
-
-            if (typeof ma !== 'undefined' && ma !== null) {
-                var reMsg_ng = /(:\w+;)/;
-                var smiley;
-                
-                for (var i = 0; i < ma.length; i++) {
-                    ma[i] = ma[i].substr(1, ma[i].length -2);
-                    smiley = "<img class='smiley' src='/smileys/" + ma[i] + ".png' />";
-                    msg = msg.replace(reMsg_ng, smiley);
-                };
-            }
-            **/
-
-
-			var snd1 = new Audio("./audio/pussies.wav");
-			var snd2 = new Audio("./audio/a-team_crazy_fool_x.wav");
-			var snd3 = new Audio("./audio/whats_your_name.wav");
-			if(messages == '%pussy%') {
-			  snd1.play();
-			} else if (messages == '%crazy fool%'){
-			  snd2.play();
-			} else if (messages == '%your name%'){
-			  snd3.play();
-			}
-
-			$('#messages').append($('<li>').html(msg));
-
-			var snd = new Audio("./audio/click.wav");
-			snd.play();
-
-			// check storage functionality
-			if (typeof (Storage) !== "undefined" && Storage != null) {
-				// overwrite timestamp
-				var date = new Date();
-				localStorage.setItem("timestamp", date.getTime());
-
-				// get messages, add new message and overwrite it to the storage
-				var messages = $.parseJSON(localStorage.getItem("messages"));
-
-				if (messages == null) {
-					messages = [];
-				}
-
-				if (messages.length >= 20) {
-					messages.shift();
-				}
-
-				messages.push(msg);
-
-				localStorage.setItem("messages", JSON.stringify(messages))
-			}
-		});
-		socket.on('user connected clear', function () {
-			document.getElementById('user').innerHTML = "<h2>Userlist</h2>";
-		});
-		socket.on('user connected', function (usr, smileys) {
-			$("#div_smiley").empty();
-
-			$.each(smileys, function (index, value) {
-				DataValue = value.substr(0, value.length - 4);
-				$("#div_smiley").append($('<img>').attr("src", "smileys/" + value).addClass("smiley_function").attr("data-name", DataValue));
-			}); //end each()
-
-			$('.smiley_function').on("click", function () {
-				$("#m").val($("#m").val() + ":" + $(this).data("name") + ";");
-				$("#div_smiley").hide();
-				$("#m").focus();
-			});
-
-			$('#user').append($('<li>').text(usr));
-		});
-	</script>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/adapter.js"></script>
 </body>
 
 </html>
