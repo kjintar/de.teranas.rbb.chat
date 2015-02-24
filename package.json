@@ -1,6 +1,7 @@
 {
   "name": "chat-that",
   "version": "0.1.1",
+  "private": true,
   "description": "Node - Socket.io based Chat suited for the local network",
   "repository": {
   "type": "git",
